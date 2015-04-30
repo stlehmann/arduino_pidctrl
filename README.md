@@ -7,12 +7,12 @@
 The purpose of this library is to provide a basic PID controller algorithm.
 
 ## Features
-    * pid controller class where each instance is fully configurable via
-      properties and functions
-    * antiwindup
-    * overflow protection at runtime
-    * use of 32 bit integers
-    * cycletime measurement, so no need to provide constant cycletimes
+* pid controller class where each instance is fully configurable via
+  properties and functions
+* antiwindup
+* overflow protection at runtime
+* use of 32 bit integers
+* cycletime measurement, so no need to provide constant cycletimes
 
 ## Examples
 
