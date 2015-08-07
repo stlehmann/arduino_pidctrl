@@ -12,24 +12,27 @@ int brackets = 0;
 void decode_json(char *json) {
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(json);
-    pid.kp = root["kp"];
-    pid.ki = root["ki"];
-    pid.kd = root["kd"];
-    pid.in = root["in"];
+    if (root.containsKey("kp")) pid.kp = root["kp"];
+    if (root.containsKey("ki")) pid.ki = root["ki"];
+    if (root.containsKey("kd")) pid.kd = root["kd"];
+    if (root.containsKey("in")) pid.in = root["in"];
+    if (root.containsKey("reset")) pid.reset();
 }
 
 
 void encode_json() {
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
-    root["kp"] = pid.kp;
-    root["ki"] = pid.ki;
-    root["kd"] = pid.kd;
-    root["in"] = pid.in;
-    root["y"] = pid.y;
+
+    JsonObject& pv = root.createNestedObject("processvalues");
+    pv["kp"] = pid.kp;
+    pv["ki"] = pid.ki;
+    pv["kd"] = pid.kd;
+    pv["in"] = pid.in;
+    pv["y"] = pid.y;
 
     root.printTo(Serial);
-    Serial.print('\n');
+    Serial.print("\n");
 }
 
 
@@ -44,22 +47,11 @@ void setup() {
 
 
 void loop() {
-    while (Serial.available()) {
-        char inchar = Serial.read();
-        inbuf += inchar;
-
-        if (inchar == '{') {
-            brackets++;
-        }
-        else if (inchar == '}') {
-            brackets--;
-            if (brackets == 0) {
-                char buf[200];
-                inbuf.toCharArray(buf, sizeof(buf));
-                decode_json(buf);
-                inbuf = "";
-            }
-        }
+    if (Serial.available()) {
+        inbuf = Serial.readStringUntil('\n');
+        char buf[200];
+        inbuf.toCharArray(buf, sizeof(buf));
+        decode_json(buf);
     }
 
     pid.process();

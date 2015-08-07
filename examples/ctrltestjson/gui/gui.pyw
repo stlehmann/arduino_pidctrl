@@ -7,13 +7,14 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QSpinBox, \
     QGridLayout, QPushButton, QGroupBox, QVBoxLayout
 from PyQt5.QtCore import QTimer
 
-COMPORT = "COM36"
+COMPORT = "/dev/cu.usbmodemfd121"
 
 
 class MySpinBox(QSpinBox):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setRange(-100000, 100000)
+
 
 class CtrlTestGui(QWidget):
 
@@ -29,6 +30,7 @@ class CtrlTestGui(QWidget):
         self.sendtimer.timeout.connect(self.tojson)
 
         self._dirty = False
+        self.__resetpid = False
 
         # Control Parameters
         # ------------------
@@ -39,21 +41,25 @@ class CtrlTestGui(QWidget):
         self.pSpinBox = MySpinBox()
         self.pSpinBox.valueChanged.connect(self.set_dirty)
         self.pLabel.setBuddy(self.pSpinBox)
+
         # I-part
         self.iLabel = QLabel("I:")
         self.iSpinBox = MySpinBox()
         self.iSpinBox.valueChanged.connect(self.set_dirty)
         self.iLabel.setBuddy(self.iSpinBox)
+        
         # D-part
         self.dLabel = QLabel("D:")
         self.dSpinBox = MySpinBox()
         self.dSpinBox.valueChanged.connect(self.set_dirty)
         self.dLabel.setBuddy(self.dSpinBox)
+        
         # Input
         self.inLabel= QLabel("In:")
         self.inSpinBox = MySpinBox()
         self.inSpinBox.valueChanged.connect(self.set_dirty)
         self.inLabel.setBuddy(self.inSpinBox)
+        
         # Layout
         layout = QGridLayout()
         layout.addWidget(self.pLabel, 0, 0)
@@ -74,29 +80,37 @@ class CtrlTestGui(QWidget):
         self.ypLabel = QLabel("yp:")
         self.ypSpinBox = MySpinBox()
         self.ypSpinBox.setReadOnly(True)
+        self.ypSpinBox.setButtonSymbols(QSpinBox.NoButtons)
         self.ypLabel.setBuddy(self.ypSpinBox)
 
         # yi
         self.yiLabel = QLabel("yi:")
         self.yiSpinBox = MySpinBox()
         self.yiSpinBox.setReadOnly(True)
+        self.yiSpinBox.setButtonSymbols(QSpinBox.NoButtons)
         self.yiLabel.setBuddy(self.yiSpinBox)
 
         # yd
         self.ydLabel = QLabel("yd:")
         self.ydSpinBox = MySpinBox()
         self.ydSpinBox.setReadOnly(True)
+        self.ydSpinBox.setButtonSymbols(QSpinBox.NoButtons)
         self.ydLabel.setBuddy(self.ydSpinBox)
 
         # y
         self.yLabel = QLabel("y:")
         self.ySpinBox = MySpinBox()
         self.ySpinBox.setReadOnly(True)
+        self.ySpinBox.setButtonSymbols(QSpinBox.NoButtons)
         font = self.yLabel.font()
         font.setBold(True)
         self.yLabel.setFont(font)
         self.ySpinBox.setFont(font)
         self.yLabel.setBuddy(self.ySpinBox)
+
+        # Reset Button
+        self.resetButton = QPushButton("Reset")
+        self.resetButton.pressed.connect(self.reset_pid)
 
         layout = QGridLayout()
         layout.addWidget(self.ypLabel, 0, 0)
@@ -107,6 +121,7 @@ class CtrlTestGui(QWidget):
         layout.addWidget(self.ydSpinBox, 2, 1)
         layout.addWidget(self.yLabel, 3, 0)
         layout.addWidget(self.ySpinBox, 3, 1)
+        layout.addWidget(self.resetButton, 4, 0, 1, 2)
         statusGroup.setLayout(layout)
 
         layout = QGridLayout()
@@ -129,9 +144,12 @@ class CtrlTestGui(QWidget):
             "kp": self.pSpinBox.value(),
             "ki": self.iSpinBox.value(),
             "kd": self.dSpinBox.value(),
-            "in": self.inSpinBox.value()
+            "in": self.inSpinBox.value(),
+            "reset": self.__resetpid
             })
         self.serial.write(bytearray(json_string, 'utf-8'))
+
+        self.__resetpid = False
 
     def fromjson(self):
         if self.serial.inWaiting():
@@ -149,8 +167,12 @@ class CtrlTestGui(QWidget):
             except (KeyError, ValueError) as e:
                 print(e)
 
+    def reset_pid(self):
+    	self.__resetpid = True
+
     def set_dirty(self):
         self.dirty = True
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
