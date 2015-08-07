@@ -45,6 +45,11 @@ long PIDCtrl::process() {
             sum += l;
         }
     }
+
+    if (reset) {
+        sum = 0;
+    }
+
     yi = sum;
 
     //differential part
@@ -61,8 +66,4 @@ long PIDCtrl::process() {
 long PIDCtrl::process(long in) {
     this->in = in;
     return this->process();
-}
-
-void PIDCtrl::reset() {
-    sum = 0;
 }

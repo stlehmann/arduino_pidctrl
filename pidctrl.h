@@ -51,6 +51,9 @@ class PIDCtrl {
          */
         bool antiwindup = false;
 
+        //! Reset sum of integral part
+        bool reset = false;
+
         PIDCtrl();
         PIDCtrl(long kp, long ki, long kd);
 
@@ -61,9 +64,6 @@ class PIDCtrl {
          */
         long process();
         long process(long in);
-
-        //! Reset sum of integral part
-        void reset();
 };
 
 /** @}*/

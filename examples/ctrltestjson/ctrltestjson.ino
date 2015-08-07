@@ -28,9 +28,8 @@ void encode_json() {
     root["in"] = pid.in;
     root["y"] = pid.y;
 
-    char buf[256];
-    root.printTo(buf, sizeof(buf));
-    Serial.print(buf);
+    root.printTo(Serial);
+    Serial.print('\n');
 }
 
 
