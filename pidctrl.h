@@ -14,56 +14,59 @@
 #ifndef PIDCTRL_H_
 #define PIDCTRL_H_
 
+
+#include <stdint.h>
+
+
 class PIDCtrl {
     private:
         //! Maximum allowed error, avoid overflow
-        long max_delta = 0;
+        int32_t max_delta;
         //! millis of last cycle
-        long last_cycle = 0;
+        int32_t last_cycle;
 
     public:
         //! proportional, integral and differential part
-        long yp, yi, yd;
+        int32_t yp, yi, yd;
         //! difference between setpoint and current value
-        long in = 0;
+        int32_t in;
         //! cummulated difference between setpoint and current value
-        long sum = 0;
+        int32_t sum;
         //! difference between setpoint and current value of last cycle
-        long last_in = 0;
+        int32_t last_in;
         //! controller output
-        long y = 0;
+        int32_t y;
         //! proportional gain
-        long kp = 0;
+        int32_t kp;
         //! integral gain
-        long ki = 0;
+        int32_t ki;
         //! differential gain
-        long kd = 0;
+        int32_t kd;
         //! minimum y value
-        long min = -1000;
+        int32_t min;
         //! maximum y value
-        long max = 1000;
+        int32_t max;
         //! cycletime of last cycle
-        long cycletime;
+        int32_t cycletime;
 
         //!antiwindup option.
         /*! i part will stop counting if ymax is reached
             default: true
          */
-        bool antiwindup = false;
+        bool antiwindup;
 
         //! Reset sum of integral part
-        bool reset = false;
+        bool reset;
 
         PIDCtrl();
-        PIDCtrl(long kp, long ki, long kd);
 
         //! Calculate controller output.
         /*!
          *  Call this function with a certain cycletime defined by the
          *  `CYCLETIME` constant.
          */
-        long process();
-        long process(long in);
+        int32_t process();
+        int32_t process(int32_t in);
 };
 
 /** @}*/

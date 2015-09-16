@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include <limits.h>
 
+
 long limit(long val, long min, long max)
 {
     if (val > max)
@@ -17,13 +18,23 @@ long limit(long val, long min, long max)
     return val;
 }
 
-PIDCtrl::PIDCtrl() {}
 
-PIDCtrl::PIDCtrl(long kp, long ki, long kd) {
-    kp = kp;
-    ki = ki;
-    kd = kd;
+PIDCtrl::PIDCtrl() {
+    max_delta = 0;
+    last_cycle = 0;
+    in = 0;
+    sum = 0;
+    last_in = 0;
+    y = 0;
+    kp = 0;
+    ki = 0;
+    kd = 0;
+    min = -1000;
+    max = 1000;
+    antiwindup = false;
+    reset = false;
 }
+
 
 long PIDCtrl::process() {
     cycletime = millis() - last_cycle;
@@ -62,6 +73,7 @@ long PIDCtrl::process() {
 
     return y;
 }
+
 
 long PIDCtrl::process(long in) {
     this->in = in;
