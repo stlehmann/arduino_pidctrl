@@ -4,4 +4,4 @@
 pidctrl	KEYWORD1
 
 # TYPE names - KEYWORD1
-PIDCtrl KEYWORD2
+PIDCtrl	KEYWORD2
